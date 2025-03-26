@@ -8,7 +8,6 @@ import { createClineAPI } from "./exports"
 import "./utils/path" // necessary to have access to String.prototype.toPosix
 import { DIFF_VIEW_URI_SCHEME } from "./integrations/editor/DiffViewProvider"
 import assert from "node:assert"
-import { telemetryService } from "./services/telemetry/TelemetryService"
 
 /*
 Built using https://github.com/microsoft/vscode-webview-ui-toolkit
@@ -24,11 +23,11 @@ let outputChannel: vscode.OutputChannel
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	outputChannel = vscode.window.createOutputChannel("Cline")
+	outputChannel = vscode.window.createOutputChannel("PCline")
 	context.subscriptions.push(outputChannel)
 
 	Logger.initialize(outputChannel)
-	Logger.log("Cline extension activated")
+	Logger.log("PCline extension activated")
 
 	const sidebarProvider = new ClineProvider(context, outputChannel)
 
@@ -62,7 +61,7 @@ export function activate(context: vscode.ExtensionContext) {
 	)
 
 	const openClineInNewTab = async () => {
-		Logger.log("Opening Cline in new tab")
+		Logger.log("Opening PCline in new tab")
 		// (this example uses webviewProvider activation event which is necessary to deserialize cached webview, but since we use retainContextWhenHidden, we don't need to use that event)
 		// https://github.com/microsoft/vscode-extension-samples/blob/main/webview-sample/src/extension.ts
 		const tabProvider = new ClineProvider(context, outputChannel)
@@ -76,7 +75,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		const targetCol = hasVisibleEditors ? Math.max(lastCol + 1, 1) : vscode.ViewColumn.Two
 
-		const panel = vscode.window.createWebviewPanel(ClineProvider.tabPanelId, "Cline", targetCol, {
+		const panel = vscode.window.createWebviewPanel(ClineProvider.tabPanelId, "PCline", targetCol, {
 			enableScripts: true,
 			retainContextWhenHidden: true,
 			localResourceRoots: [context.extensionUri],
@@ -127,7 +126,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand("cline.openDocumentation", () => {
-			vscode.env.openExternal(vscode.Uri.parse("https://docs.cline.bot/"))
+			vscode.env.openExternal(vscode.Uri.parse("YOUR_INTERNAL_DOCUMENTATION_URL"))
 		}),
 	)
 
@@ -160,35 +159,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return
 		}
 		switch (path) {
-			case "/openrouter": {
-				const code = query.get("code")
-				if (code) {
-					await visibleProvider.handleOpenRouterCallback(code)
-				}
-				break
-			}
-			case "/auth": {
-				const token = query.get("token")
-				const state = query.get("state")
-				const apiKey = query.get("apiKey")
-
-				console.log("Auth callback received:", {
-					token: token,
-					state: state,
-					apiKey: apiKey,
-				})
-
-				// Validate state parameter
-				if (!(await visibleProvider.validateAuthState(state))) {
-					vscode.window.showErrorMessage("Invalid auth state")
-					return
-				}
-
-				if (token && apiKey) {
-					await visibleProvider.handleAuthCallback(token, apiKey)
-				}
-				break
-			}
+			// Remove all external auth handlers as they aren't needed
 			default:
 				break
 		}
@@ -202,7 +173,7 @@ export function activate(context: vscode.ExtensionContext) {
 			.then((module) => {
 				const devTaskCommands = module.registerTaskCommands(context, sidebarProvider)
 				context.subscriptions.push(...devTaskCommands)
-				Logger.log("Cline dev task commands registered")
+				Logger.log("PCline dev task commands registered")
 			})
 			.catch((error) => {
 				Logger.log("Failed to register dev task commands: " + error)
@@ -309,17 +280,17 @@ export function activate(context: vscode.ExtensionContext) {
 						document.lineAt(Math.min(document.lineCount - 1, range.end.line + 3)).text.length,
 					)
 
-					const addAction = new vscode.CodeAction("Add to Cline", vscode.CodeActionKind.QuickFix)
+					const addAction = new vscode.CodeAction("Add to PCline", vscode.CodeActionKind.QuickFix)
 					addAction.command = {
 						command: "cline.addToChat",
-						title: "Add to Cline",
+						title: "Add to PCline",
 						arguments: [expandedRange, context.diagnostics],
 					}
 
-					const fixAction = new vscode.CodeAction("Fix with Cline", vscode.CodeActionKind.QuickFix)
+					const fixAction = new vscode.CodeAction("Fix with PCline", vscode.CodeActionKind.QuickFix)
 					fixAction.command = {
 						command: "cline.fixWithCline",
-						title: "Fix with Cline",
+						title: "Fix with PCline",
 						arguments: [expandedRange, context.diagnostics],
 					}
 
@@ -359,8 +330,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 // This method is called when your extension is deactivated
 export function deactivate() {
-	telemetryService.shutdown()
-	Logger.log("Cline extension deactivated")
+	Logger.log("PCline extension deactivated")
 }
 
 // TODO: Find a solution for automatically removing DEV related content from production builds.
