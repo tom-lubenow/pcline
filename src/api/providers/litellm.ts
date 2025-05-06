@@ -12,7 +12,8 @@ export class LiteLlmHandler implements ApiHandler {
 	constructor(options: ApiHandlerOptions) {
 		this.options = options
 		this.client = new OpenAI({
-			baseURL: this.options.liteLlmBaseUrl || "http://localhost:4000",
+			// PCline: Use internal LiteLLM server by default - user can override with liteLlmBaseUrl setting
+			baseURL: this.options.liteLlmBaseUrl || "http://litellm-proxy.internal.domain:4000",
 			apiKey: this.options.liteLlmApiKey || "noop",
 		})
 	}

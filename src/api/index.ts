@@ -35,6 +35,12 @@ export interface SingleCompletionHandler {
 
 export function buildApiHandler(configuration: ApiConfiguration): ApiHandler {
 	const { apiProvider, ...options } = configuration
+
+	// PCline: Simplified API handler - only supporting LiteLLM
+	// Always use LiteLLM handler regardless of the apiProvider setting
+	return new LiteLlmHandler(options)
+
+	/* Original provider selection code:
 	switch (apiProvider) {
 		case "anthropic":
 			return new AnthropicHandler(options)
@@ -81,4 +87,5 @@ export function buildApiHandler(configuration: ApiConfiguration): ApiHandler {
 		default:
 			return new AnthropicHandler(options)
 	}
+	*/
 }

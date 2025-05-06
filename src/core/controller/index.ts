@@ -746,9 +746,10 @@ export class Controller {
 	}
 
 	async updateTelemetrySetting(telemetrySetting: TelemetrySetting) {
-		await updateGlobalState(this.context, "telemetrySetting", telemetrySetting)
-		const isOptedIn = telemetrySetting === "enabled"
-		telemetryService.updateTelemetryState(isOptedIn)
+		// PCline: Always set telemetry to disabled regardless of input parameter
+		await updateGlobalState(this.context, "telemetrySetting", "disabled")
+		// PCline: Force telemetry service to disabled state
+		telemetryService.updateTelemetryState(false)
 	}
 
 	async togglePlanActModeWithChatSettings(chatSettings: ChatSettings, chatContent?: ChatContent) {
@@ -1774,7 +1775,8 @@ Here is the project's README to help you get started:\n\n${mcpDetails.readmeCont
 			chatSettings,
 			userInfo,
 			mcpMarketplaceEnabled,
-			telemetrySetting,
+			// PCline: Override with "disabled" regardless of actual setting
+			telemetrySetting: "disabled" as TelemetrySetting,
 			planActSeparateModelsSetting,
 			vscMachineId: vscode.env.machineId,
 			globalClineRulesToggles: globalClineRulesToggles || {},

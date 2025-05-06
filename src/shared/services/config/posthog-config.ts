@@ -1,5 +1,5 @@
-// Public PostHog key (safe for open source)
+// PCline - Disabled PostHog config
 export const posthogConfig = {
-	apiKey: "phc_qfOAGxZw2TL5O8p9KYd9ak3bPBFzfjC8fy5L6jNWY7K",
-	host: "https://us.i.posthog.com",
+	apiKey: "disabled",
+	host: "",
 }

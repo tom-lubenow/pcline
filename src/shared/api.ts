@@ -1436,7 +1436,8 @@ export const mistralModels = {
 // LiteLLM
 // https://docs.litellm.ai/docs/
 export type LiteLLMModelId = string
-export const liteLlmDefaultModelId = "gpt-3.5-turbo"
+// PCline: Update default model to an available one on our internal LiteLLM server
+export const liteLlmDefaultModelId = "claude-3-7-sonnet-20250219"
 export const liteLlmModelInfoSaneDefaults: ModelInfo = {
 	maxTokens: -1,
 	contextWindow: 128_000,
